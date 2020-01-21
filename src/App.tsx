@@ -4,19 +4,9 @@ import './App.css';
 import Jimp from 'jimp';
 
 const App: React.FC = () => {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <EditorCanvas renderedText={'비트코인 100억 간다'}/>
-        <Upload/>
-      </header>
-    </div>
-  );
-}
-
-const Upload: React.FC = () => {
-
-  const [fileUrl, setfileUrl] = useState()
+  let imgSrc2 = 'https://w0.pngwave.com/png/132/811/bitcoin-cryptocurrency-blockchain-sticker-laptop-bitcoin-png-clip-art.png';
+  const [fileUrl, setfileUrl] = useState(imgSrc2)
+  const [editedFileUrl, setEditedfileUrl] = useState(imgSrc2)
 
   const handleChangeFile: React.ChangeEventHandler<HTMLInputElement> = (event: React.ChangeEvent<HTMLInputElement>) => {
     const url = URL.createObjectURL((event as any).target.files[0])
@@ -24,11 +14,31 @@ const Upload: React.FC = () => {
     setfileUrl(url)
   }
 
+  const changeFile = (url:string) => {
+    setEditedfileUrl(url);
+  }
+  
+  return (
+    <div className="App">
+      <header className="App-header">
+        <EditorCanvas renderedText={'비트코인 100억 간다'} imgSrc={fileUrl} changeFile={changeFile} editedImgSrc={editedFileUrl}/>
+        <Upload handleChangeFile={handleChangeFile} downloadUrl={editedFileUrl}/>
+      </header>
+    </div>
+  );
+}
+
+interface UploadProps {
+  handleChangeFile: (event: React.ChangeEvent<HTMLInputElement>) => (any);
+  downloadUrl: string;
+}
+
+const Upload: React.FC<UploadProps> = ({handleChangeFile, downloadUrl}) => {
+
   return (
     <div>
       <input type="file" onChange={handleChangeFile}/>
-      <img src={fileUrl} width="300px" height="100px" alt="asdf"/>
-      <a href={fileUrl} download="true">다운로드</a>
+      <a href={downloadUrl} download="thumbnail">다운로드</a>
     </div>
   )
 }
@@ -36,12 +46,15 @@ const Upload: React.FC = () => {
 
 interface CanvasProps {
   renderedText: string;
+  imgSrc: string;
+  changeFile: (url:string) => (void);
+  editedImgSrc: string;
 }
-const EditorCanvas: React.FC<CanvasProps> = ({ renderedText }) => {
 
-  let imgSrc = 'https://w0.pngwave.com/png/132/811/bitcoin-cryptocurrency-blockchain-sticker-laptop-bitcoin-png-clip-art.png';
-  const [editedImgSrc, setEditedImgSrc] = useState('');
+const EditorCanvas: React.FC<CanvasProps> = ({ renderedText, imgSrc, changeFile, editedImgSrc}) => {
 
+
+  console.log(imgSrc);
   useEffect(()=> {
     Jimp.read(imgSrc, async (err, imgLoaded) => {
       
@@ -86,14 +99,13 @@ const EditorCanvas: React.FC<CanvasProps> = ({ renderedText }) => {
         .print(font, bottomX, bottomY, renderedText)
         .color([{ apply: 'xor', params:[orangeColorHexInverse]}])
 
-        .color([{ apply: 'xor', params:['#00ff00']}])
+        .color([{ apply: 'xor', params:['#ffffff']}])
         .invert()
         .print(font, bottomX, bottomY, renderedText.slice(0,2))
-        .color([{ apply: 'xor', params:['#ff00ff']}])
+        .color([{ apply: 'xor', params:['#000000']}])
         
       
       // resize text
-
       await textCanvas.resize(textCanvasWidth*2, textCanvasHeight*2);
       const compositBottomX = 10;
       const compositBottomY = imgLoaded.getHeight() - textCanvasHeight
@@ -103,10 +115,11 @@ const EditorCanvas: React.FC<CanvasProps> = ({ renderedText }) => {
       // let imgBase64 = await textCanvas.getBase64Async(Jimp.MIME_PNG);
       // setEditedImgSrc(imgBase64);
       let imgBase64 = await imgLoaded.getBase64Async(Jimp.MIME_PNG);
-      setEditedImgSrc(imgBase64);
+      // setEditedImgSrc(imgBase64);
+      changeFile(imgBase64);
     })
     
-  }, [])
+  }, [imgSrc])
 
   return (
     <div>
