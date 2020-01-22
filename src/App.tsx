@@ -1,10 +1,10 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import Jimp from 'jimp';
 
 const App: React.FC = () => {
-  let imgSrc2 = 'https://w0.pngwave.com/png/132/811/bitcoin-cryptocurrency-blockchain-sticker-laptop-bitcoin-png-clip-art.png';
+  let imgSrc2 = 'https://static1.squarespace.com/static/5914dd0d1b10e39c76258fe6/5914dd3b9f7456d2c423df0f/5af3fd7ef950b7dea0e5a6e0/1548246450471/Article+Image+%2813%29.png';
   const [fileUrl, setfileUrl] = useState(imgSrc2)
   const [editedFileUrl, setEditedfileUrl] = useState(imgSrc2)
 
@@ -14,15 +14,15 @@ const App: React.FC = () => {
     setfileUrl(url)
   }
 
-  const changeFile = (url:string) => {
+  const changeFile = (url: string) => {
     setEditedfileUrl(url);
   }
-  
+
   return (
     <div className="App">
       <header className="App-header">
-        <EditorCanvas renderedText={'비트코인 100억 간다'} imgSrc={fileUrl} changeFile={changeFile} editedImgSrc={editedFileUrl}/>
-        <Upload handleChangeFile={handleChangeFile} downloadUrl={editedFileUrl}/>
+        <EditorCanvas renderedText={`비트코인 100억 간다`} imgSrc={fileUrl} changeFile={changeFile} editedImgSrc={editedFileUrl} />
+        <Upload handleChangeFile={handleChangeFile} downloadUrl={editedFileUrl} />
       </header>
     </div>
   );
@@ -33,11 +33,11 @@ interface UploadProps {
   downloadUrl: string;
 }
 
-const Upload: React.FC<UploadProps> = ({handleChangeFile, downloadUrl}) => {
+const Upload: React.FC<UploadProps> = ({ handleChangeFile, downloadUrl }) => {
 
   return (
     <div>
-      <input type="file" onChange={handleChangeFile}/>
+      <input type="file" onChange={handleChangeFile} />
       <a href={downloadUrl} download="thumbnail">다운로드</a>
     </div>
   )
@@ -47,68 +47,68 @@ const Upload: React.FC<UploadProps> = ({handleChangeFile, downloadUrl}) => {
 interface CanvasProps {
   renderedText: string;
   imgSrc: string;
-  changeFile: (url:string) => (void);
+  changeFile: (url: string) => (void);
   editedImgSrc: string;
 }
 
-const EditorCanvas: React.FC<CanvasProps> = ({ renderedText, imgSrc, changeFile, editedImgSrc}) => {
 
+const createColoredText = async (font: any, fullText: string, color: string, coloredText: string) => {
+  let from = fullText.indexOf(coloredText);
+  let to = from + coloredText.length;
 
-  console.log(imgSrc);
-  useEffect(()=> {
+  const textCanvasHeight = 140;
+  const textCanvasWidth = 1000;
+
+  let transparentColor: number = await (Jimp as any).rgbaToInt(100, 100, 0, 0.5);
+  let textCanvas3 = await new Jimp(textCanvasWidth, textCanvasHeight, transparentColor);
+
+  let wi = Jimp.measureText(font, fullText.slice(0, from));
+  // let he = Jimp.measureTextHeight(font, fullText.slice(0, from), wi);
+
+  return (await textCanvas3.print(font, wi, 0, coloredText).color([{ apply: 'xor', params: [color] }]));
+}
+const EditorCanvas: React.FC<CanvasProps> = ({ renderedText, imgSrc, changeFile, editedImgSrc }) => {
+
+  useEffect(() => {
     Jimp.read(imgSrc, async (err, imgLoaded) => {
-      
+
       const fontHeight = 50;
       const bottomX = 10
       const bottomY = 0;
-      const shadowOffset = 2;
+      const shadowOffset = 4;
       // get text
       console.log(`[TEXT FROM PROPS]${renderedText}`)
 
-      
-      const textCanvasHeight = 100;
-      const textCanvasWidth = 300;
+
+      const textCanvasHeight = 150;
+      const textCanvasWidth = 1000;
       let transparentColor: number = await (Jimp as any).rgbaToInt(100, 100, 0, 0.5);
       let textCanvas = await new Jimp(textCanvasWidth, textCanvasHeight, transparentColor);
       // img resize
       await imgLoaded.resize(1280, 720);
       // load font
       // const fontPath = `${process.env.PUBLIC_URL}/nanum/nanum.fnt`;
-      const fontPath = `./nanum/nanum.fnt`;      
+      const fontPath = `./nanum-barun-gothic-100/nanum100bg.fnt`;
       let font = await Jimp.loadFont(fontPath);
       // print text to the bottom line
 
-      const invertHex = (hex: string) => {
-        hex = hex.slice(1);
-        let hexString = (Number(`0x1${hex}`) ^ 0xFFFFFF).toString(16).substr(1).toUpperCase();
-        return `#${hexString}`
-      }
       let orangeColor = '#ffd042'
-      let orangeColorHexInverse = invertHex(orangeColor); // Returns FF00FF
-      // let orangeColorHexInverse = invertHex('edc261'); // Returns FF00FF
-
-      // print shadow of the all text
-      await textCanvas.color([{ apply: 'xor', params:['#000000']}])
-        .invert()
-        .print(font, bottomX + shadowOffset, bottomY + shadowOffset, renderedText)
-        .color([{ apply: 'xor', params:['#ffffff']}])
-
-      // print text
-        .color([{ apply: 'xor', params:[orangeColor]}])
-        .invert()
-        .print(font, bottomX, bottomY, renderedText)
-        .color([{ apply: 'xor', params:[orangeColorHexInverse]}])
-
-        .color([{ apply: 'xor', params:['#ffffff']}])
-        .invert()
-        .print(font, bottomX, bottomY, renderedText.slice(0,2))
-        .color([{ apply: 'xor', params:['#000000']}])
-        
+      let whiteColor = '#ffffff'
+      let blackColor = '#000000'
+      let separator = renderedText.indexOf(' ');
+      let shadow = await createColoredText(font, renderedText, blackColor, renderedText);
+      let text3 = await createColoredText(font, renderedText, whiteColor, renderedText.slice(0, separator));
+      let text2 = await createColoredText(font, renderedText, orangeColor, renderedText.slice(separator));
       
+      // let text3 = await createColoredText(renderedText, whiteColor, '비트코인');
+
+      await textCanvas.composite(shadow, shadowOffset, shadowOffset);
+      await textCanvas.composite(text3, 0, 0);
+      await textCanvas.composite(text2, 0, 0);
+
       // resize text
-      await textCanvas.resize(textCanvasWidth*2, textCanvasHeight*2);
       const compositBottomX = 10;
-      const compositBottomY = imgLoaded.getHeight() - textCanvasHeight
+      const compositBottomY = imgLoaded.getHeight() - textCanvasHeight - 10
       await imgLoaded.composite(textCanvas, compositBottomX, compositBottomY);
 
       // get base64 encoded imge to use in the img component
@@ -118,7 +118,7 @@ const EditorCanvas: React.FC<CanvasProps> = ({ renderedText, imgSrc, changeFile,
       // setEditedImgSrc(imgBase64);
       changeFile(imgBase64);
     })
-    
+
   }, [imgSrc])
 
   return (
@@ -127,6 +127,10 @@ const EditorCanvas: React.FC<CanvasProps> = ({ renderedText, imgSrc, changeFile,
     </div>
   )
 }
-
+const invertHex = (hex: string) => {
+  hex = hex.slice(1);
+  let hexString = (Number(`0x1${hex}`) ^ 0xFFFFFF).toString(16).substr(1).toUpperCase();
+  return `#${hexString}`
+}
 
 export default App;
