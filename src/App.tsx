@@ -7,6 +7,12 @@ const App: React.FC = () => {
   let imgSrc2 = 'https://static1.squarespace.com/static/5914dd0d1b10e39c76258fe6/5914dd3b9f7456d2c423df0f/5af3fd7ef950b7dea0e5a6e0/1548246450471/Article+Image+%2813%29.png';
   const [fileUrl, setfileUrl] = useState(imgSrc2)
   const [editedFileUrl, setEditedfileUrl] = useState(imgSrc2)
+  const [newText, setNewText] = useState('');
+  const [renderedText, setRenderedText] = useState('');
+
+  const onChangeText = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNewText(event.target.value);
+  }
 
   const handleChangeFile: React.ChangeEventHandler<HTMLInputElement> = (event: React.ChangeEvent<HTMLInputElement>) => {
     const url = URL.createObjectURL((event as any).target.files[0])
@@ -18,11 +24,18 @@ const App: React.FC = () => {
     setEditedfileUrl(url);
   }
 
+  const onClickGenerate = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    setRenderedText(newText);
+    console.log("im clicked");
+  }
+
   return (
     <div className="App">
       <header className="App-header">
-        <EditorCanvas renderedText={`비트코인 100억 간다`} imgSrc={fileUrl} changeFile={changeFile} editedImgSrc={editedFileUrl} />
+        <EditorCanvas renderedText={renderedText} imgSrc={fileUrl} changeFile={changeFile} editedImgSrc={editedFileUrl} />
         <Upload handleChangeFile={handleChangeFile} downloadUrl={editedFileUrl} />
+        <input value={newText} onChange={onChangeText} />
+        <button onClick={onClickGenerate}>적용</button>
       </header>
     </div>
   );
@@ -119,7 +132,7 @@ const EditorCanvas: React.FC<CanvasProps> = ({ renderedText, imgSrc, changeFile,
       changeFile(imgBase64);
     })
 
-  }, [imgSrc])
+  }, [imgSrc, renderedText])
 
   return (
     <div>
