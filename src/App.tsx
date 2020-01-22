@@ -8,12 +8,12 @@ const nanumFontPath = `./nanum-barun-gothic-100/nanum100bg.fnt`;
 const spocaSansFontPath = `./spoca-han-sans/spocahansans.fnt`;
 
 const App: React.FC = () => {
-  const [fileUrl, setfileUrl] = useState(defaultSource)
+  const [fileUrl, setfileUrl] = useState('')
   const [editedFileUrl, setEditedfileUrl] = useState('')
-  const [newText, setNewText] = useState('지금은 너도 내 점심이지');
-  const [newText2, setNewText2] = useState('너 맛있게 생겼다');
-  const [renderedText, setRenderedText] = useState('지금은 너도 내 점심이지');
-  const [renderedText2, setRenderedText2] = useState('너 맛있게 생겼다');
+  const [newText, setNewText] = useState('');
+  const [newText2, setNewText2] = useState('');
+  const [renderedText, setRenderedText] = useState('');
+  const [renderedText2, setRenderedText2] = useState('');
 
   const [fontPath, setFontPath] = useState(nanumFontPath);
 
@@ -159,8 +159,8 @@ const EditorCanvas: React.FC<CanvasProps> = ({ fontPath, renderedText, renderedT
 
       let separator2 = renderedText2.indexOf(' ');
       let shadow2 = await createColoredText(font, renderedText2, blackColor, renderedText2);
-      let text22 = await createColoredText(font, renderedText2, whiteColor, renderedText2.slice(0, separator2));
-      let text32 = await createColoredText(font, renderedText2, orangeColor, renderedText2.slice(separator2));
+      let text22 = await createColoredText(font, renderedText2, orangeColor, renderedText2.slice(0, separator2));
+      let text32 = await createColoredText(font, renderedText2, whiteColor, renderedText2.slice(separator2));
 
       let secondOffset = textCanvasHeight - 100;
       let firstOffset = textCanvasHeight - 200;
