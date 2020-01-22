@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect, useCallback } from 'react';
 import Jimp from 'jimp';
+import { useDropzone } from 'react-dropzone';
+import './App.css';
+
 
 const App: React.FC = () => {
-  let imgSrc2 = 'https://static1.squarespace.com/static/5914dd0d1b10e39c76258fe6/5914dd3b9f7456d2c423df0f/5af3fd7ef950b7dea0e5a6e0/1548246450471/Article+Image+%2813%29.png';
-  const [fileUrl, setfileUrl] = useState(imgSrc2)
-  const [editedFileUrl, setEditedfileUrl] = useState(imgSrc2)
+  const [fileUrl, setfileUrl] = useState('')
+  const [editedFileUrl, setEditedfileUrl] = useState('')
   const [newText, setNewText] = useState('');
   const [renderedText, setRenderedText] = useState('');
 
@@ -20,7 +20,7 @@ const App: React.FC = () => {
     setfileUrl(url)
   }
 
-  const changeFile = (url: string) => {
+  const changeEditedFile = (url: string) => {
     setEditedfileUrl(url);
   }
 
@@ -32,13 +32,46 @@ const App: React.FC = () => {
   return (
     <div className="App">
       <header className="App-header">
-        <EditorCanvas renderedText={renderedText} imgSrc={fileUrl} changeFile={changeFile} editedImgSrc={editedFileUrl} />
+        { fileUrl ? <EditorCanvas renderedText={renderedText} imgSrc={fileUrl} changeFile={changeEditedFile} editedImgSrc={editedFileUrl} /> : <ImgDrop changeFile={(file) => setfileUrl(file)}/>}
         <Upload handleChangeFile={handleChangeFile} downloadUrl={editedFileUrl} />
         <input value={newText} onChange={onChangeText} />
         <button onClick={onClickGenerate}>적용</button>
       </header>
     </div>
   );
+}
+
+interface ImgDropProps {
+  changeFile: (file: string) => void;
+}
+
+const ImgDrop: React.FC<ImgDropProps> = ({changeFile}) => {
+
+  const onDrop = useCallback((acceptedFiles) => {
+    acceptedFiles.forEach((file: File) => {
+      const reader = new FileReader()
+      reader.onabort = () => console.log("file reading has aborted")
+      reader.onerror = () => console.log("file reading has failed")
+      reader.readAsDataURL(file)
+      reader.onload = () => {
+        const dataUrl = reader.result
+        if (typeof dataUrl === "string") {
+          changeFile(dataUrl)
+        }
+      }
+    });
+  }, [])
+
+  const {getRootProps, getInputProps} = useDropzone({onDrop})
+
+  return (
+    <div {...getRootProps()}>
+      <input {...getInputProps()}/>
+      <div style={{width:"1280px", height: "720px"}}>
+        <p>파일을 올려주세요</p>
+      </div>
+    </div>
+  )
 }
 
 interface UploadProps {
@@ -136,7 +169,7 @@ const EditorCanvas: React.FC<CanvasProps> = ({ renderedText, imgSrc, changeFile,
 
   return (
     <div>
-      <img src={editedImgSrc} alt="editorImg" />
+      <img width="1280px" height="720px" src={editedImgSrc} alt="editorImg" />
     </div>
   )
 }
