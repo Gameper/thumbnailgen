@@ -3,16 +3,19 @@ import Jimp from 'jimp';
 import { useDropzone } from 'react-dropzone';
 import './App.css';
 
+const defaultSource = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5XlCdYS6OP0Q5RENKnhkXWDsgfzlvssygvZul1efZtA7v9AtjKA&s';
+const nanumFontPath = `./nanum-barun-gothic-100/nanum100bg.fnt`;
+const spocaSansFontPath = `./spoca-han-sans/spocahansans.fnt`;
 
 const App: React.FC = () => {
-  const [fileUrl, setfileUrl] = useState('')
+  const [fileUrl, setfileUrl] = useState(defaultSource)
   const [editedFileUrl, setEditedfileUrl] = useState('')
-  const [newText, setNewText] = useState('');
-  const [renderedText, setRenderedText] = useState('');
+  const [newText, setNewText] = useState('지금은 너도 내 점심이지');
+  const [newText2, setNewText2] = useState('너 맛있게 생겼다');
+  const [renderedText, setRenderedText] = useState('지금은 너도 내 점심이지');
+  const [renderedText2, setRenderedText2] = useState('너 맛있게 생겼다');
 
-  const onChangeText = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setNewText(event.target.value);
-  }
+  const [fontPath, setFontPath] = useState(nanumFontPath);
 
   const handleChangeFile: React.ChangeEventHandler<HTMLInputElement> = (event: React.ChangeEvent<HTMLInputElement>) => {
     const url = URL.createObjectURL((event as any).target.files[0])
@@ -26,16 +29,19 @@ const App: React.FC = () => {
 
   const onClickGenerate = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     setRenderedText(newText);
+    setRenderedText2(newText2);
     console.log("im clicked");
   }
 
   return (
     <div className="App">
       <header className="App-header">
-        { fileUrl ? <EditorCanvas renderedText={renderedText} imgSrc={fileUrl} changeFile={changeEditedFile} editedImgSrc={editedFileUrl} /> : <ImgDrop changeFile={(file) => setfileUrl(file)}/>}
+        { fileUrl ? <EditorCanvas fontPath={fontPath} renderedText={renderedText} renderedText2={renderedText2} imgSrc={fileUrl} changeFile={changeEditedFile} editedImgSrc={editedFileUrl} /> : <ImgDrop changeFile={(file) => setfileUrl(file)}/>}
         <Upload handleChangeFile={handleChangeFile} downloadUrl={editedFileUrl} />
-        <input value={newText} onChange={onChangeText} />
+        <input value={newText} onChange={(event) => setNewText(event.target.value)} />
+        <input value={newText2} onChange={(event) => setNewText2(event.target.value)} />
         <button onClick={onClickGenerate}>적용</button>
+        <button onClick={()=> fontPath === nanumFontPath ? setFontPath(spocaSansFontPath) : setFontPath(nanumFontPath)} >폰트 전환</button>
       </header>
     </div>
   );
@@ -92,11 +98,13 @@ const Upload: React.FC<UploadProps> = ({ handleChangeFile, downloadUrl }) => {
 
 interface CanvasProps {
   renderedText: string;
+  renderedText2: string;
   imgSrc: string;
-  changeFile: (url: string) => (void);
   editedImgSrc: string;
-}
+  fontPath: string;
 
+  changeFile: (url: string) => (void);
+}
 
 const createColoredText = async (font: any, fullText: string, color: string, coloredText: string) => {
   let from = fullText.indexOf(coloredText);
@@ -113,7 +121,7 @@ const createColoredText = async (font: any, fullText: string, color: string, col
 
   return (await textCanvas3.print(font, wi, 0, coloredText).color([{ apply: 'xor', params: [color] }]));
 }
-const EditorCanvas: React.FC<CanvasProps> = ({ renderedText, imgSrc, changeFile, editedImgSrc }) => {
+const EditorCanvas: React.FC<CanvasProps> = ({ fontPath, renderedText, renderedText2, imgSrc, changeFile, editedImgSrc }) => {
 
   useEffect(() => {
     Jimp.read(imgSrc, async (err, imgLoaded) => {
@@ -126,7 +134,7 @@ const EditorCanvas: React.FC<CanvasProps> = ({ renderedText, imgSrc, changeFile,
       console.log(`[TEXT FROM PROPS]${renderedText}`)
 
 
-      const textCanvasHeight = 150;
+      const textCanvasHeight = 500;
       const textCanvasWidth = 1000;
       let transparentColor: number = await (Jimp as any).rgbaToInt(100, 100, 0, 0.5);
       let textCanvas = await new Jimp(textCanvasWidth, textCanvasHeight, transparentColor);
@@ -134,38 +142,48 @@ const EditorCanvas: React.FC<CanvasProps> = ({ renderedText, imgSrc, changeFile,
       await imgLoaded.resize(1280, 720);
       // load font
       // const fontPath = `${process.env.PUBLIC_URL}/nanum/nanum.fnt`;
-      const fontPath = `./nanum-barun-gothic-100/nanum100bg.fnt`;
+      
       let font = await Jimp.loadFont(fontPath);
       // print text to the bottom line
 
       let orangeColor = '#ffd042'
       let whiteColor = '#ffffff'
       let blackColor = '#000000'
+
+      // first line
       let separator = renderedText.indexOf(' ');
       let shadow = await createColoredText(font, renderedText, blackColor, renderedText);
-      let text3 = await createColoredText(font, renderedText, whiteColor, renderedText.slice(0, separator));
-      let text2 = await createColoredText(font, renderedText, orangeColor, renderedText.slice(separator));
+      let text2 = await createColoredText(font, renderedText, whiteColor, renderedText.slice(0, separator));
+      let text3 = await createColoredText(font, renderedText, orangeColor, renderedText.slice(separator));
       
-      // let text3 = await createColoredText(renderedText, whiteColor, '비트코인');
 
-      await textCanvas.composite(shadow, shadowOffset, shadowOffset);
-      await textCanvas.composite(text3, 0, 0);
-      await textCanvas.composite(text2, 0, 0);
+      let separator2 = renderedText2.indexOf(' ');
+      let shadow2 = await createColoredText(font, renderedText2, blackColor, renderedText2);
+      let text22 = await createColoredText(font, renderedText2, whiteColor, renderedText2.slice(0, separator2));
+      let text32 = await createColoredText(font, renderedText2, orangeColor, renderedText2.slice(separator2));
+
+      let secondOffset = textCanvasHeight - 100;
+      let firstOffset = textCanvasHeight - 200;
+      let textCanvasIndent  = 5
+      await textCanvas.composite(shadow, shadowOffset, shadowOffset + firstOffset);
+      await textCanvas.composite(text2, textCanvasIndent,  firstOffset);
+      await textCanvas.composite(text3, textCanvasIndent,  firstOffset);
+
+      await textCanvas.composite(shadow2, shadowOffset, shadowOffset + secondOffset);
+      await textCanvas.composite(text22, textCanvasIndent, secondOffset);
+      await textCanvas.composite(text32, textCanvasIndent, secondOffset);
 
       // resize text
       const compositBottomX = 10;
       const compositBottomY = imgLoaded.getHeight() - textCanvasHeight - 10
       await imgLoaded.composite(textCanvas, compositBottomX, compositBottomY);
 
-      // get base64 encoded imge to use in the img component
-      // let imgBase64 = await textCanvas.getBase64Async(Jimp.MIME_PNG);
-      // setEditedImgSrc(imgBase64);
+
       let imgBase64 = await imgLoaded.getBase64Async(Jimp.MIME_PNG);
-      // setEditedImgSrc(imgBase64);
       changeFile(imgBase64);
     })
 
-  }, [imgSrc, renderedText])
+  }, [imgSrc, renderedText, renderedText2, fontPath])
 
   return (
     <div>
