@@ -1,11 +1,27 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import Jimp from 'jimp';
-import { useDropzone } from 'react-dropzone';
+
 import './App.css';
+
+import { makeStyles, createStyles } from '@material-ui/core/styles';
+import Drawer from '@material-ui/core/Drawer';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
+import Divider from '@material-ui/core/Divider';
+import Button from '@material-ui/core/Button';
+import SaveIcon from '@material-ui/icons/Save';
+import CreateIcon from '@material-ui/icons/Create';
+import ImgDrop from './components/ImageDrop';
+import Upload from './components/Upload';
+import EditorCanvas from './components/EditorCanvas';
+import useStyles from './styles/material-ui-styles';
 
 const defaultSource = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5XlCdYS6OP0Q5RENKnhkXWDsgfzlvssygvZul1efZtA7v9AtjKA&s';
 const nanumFontPath = `./nanum-barun-gothic-100/nanum100bg.fnt`;
 const spocaSansFontPath = `./spoca-han-sans/spocahansans.fnt`;
+
 
 const App: React.FC = () => {
   const [fileUrl, setfileUrl] = useState('')
@@ -33,168 +49,81 @@ const App: React.FC = () => {
     console.log("im clicked");
   }
 
+  // return (
+  //   <div className="App">
+  //     <header className="App-header">
+  //       { fileUrl ? <EditorCanvas fontPath={fontPath} renderedText={renderedText} renderedText2={renderedText2} imgSrc={fileUrl} changeFile={changeEditedFile} editedImgSrc={editedFileUrl} /> : <ImgDrop changeFile={(file) => setfileUrl(file)}/>}
+  //       <Upload handleChangeFile={handleChangeFile} downloadUrl={editedFileUrl} />
+  //       <input value={newText} onChange={(event) => setNewText(event.target.value)} />
+  //       <input value={newText2} onChange={(event) => setNewText2(event.target.value)} />
+  //       <button onClick={onClickGenerate}>적용</button>
+  //       <button onClick={()=> fontPath === nanumFontPath ? setFontPath(spocaSansFontPath) : setFontPath(nanumFontPath)} >폰트 전환</button>
+  //     </header>
+  //   </div>
+  // );
+  const classes = useStyles();
+
   return (
-    <div className="App">
-      <header className="App-header">
-        { fileUrl ? <EditorCanvas fontPath={fontPath} renderedText={renderedText} renderedText2={renderedText2} imgSrc={fileUrl} changeFile={changeEditedFile} editedImgSrc={editedFileUrl} /> : <ImgDrop changeFile={(file) => setfileUrl(file)}/>}
+    <div className={classes.root}>
+      <CssBaseline />
+      <AppBar position="fixed" className={classes.appBar}>
+        <Toolbar>
+        Thumbnail Generator
+        </Toolbar>
+      </AppBar>
+      <main className={classes.content}>
+        <div className={classes.toolbar} />
+         { fileUrl ? <EditorCanvas fontPath={fontPath} renderedText={renderedText} renderedText2={renderedText2} imgSrc={fileUrl} changeFile={changeEditedFile} editedImgSrc={editedFileUrl} /> : <ImgDrop changeFile={(file) => setfileUrl(file)}/>}
+      </main>
+      <Drawer
+        className={classes.drawer}
+        variant="permanent"
+        classes={{
+          paper: classes.drawerPaper,
+        }}
+        anchor="right"
+      >
+        <div className={classes.toolbar} />
+        <br></br>
+        <br></br>
         <Upload handleChangeFile={handleChangeFile} downloadUrl={editedFileUrl} />
-        <input value={newText} onChange={(event) => setNewText(event.target.value)} />
-        <input value={newText2} onChange={(event) => setNewText2(event.target.value)} />
-        <button onClick={onClickGenerate}>적용</button>
-        <button onClick={()=> fontPath === nanumFontPath ? setFontPath(spocaSansFontPath) : setFontPath(nanumFontPath)} >폰트 전환</button>
-      </header>
+        <br></br>
+        폰트2
+        <br></br>
+        텍스트 위치
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <Divider />
+        <TextField value={newText} onChange={(event) => setNewText(event.target.value)} variant="filled" className={classes.textField} id="filled-required" label="Standard" inputProps={{className: classes.textField }} />
+        <TextField value={newText2} onChange={(event) => setNewText2(event.target.value)} variant="filled" className={classes.textField} id="filled-required" label="Standard" inputProps={{className: classes.textField }} />
+    
+        <br></br>
+        
+        <Button onClick={()=> fontPath === nanumFontPath ? setFontPath(spocaSansFontPath) : setFontPath(nanumFontPath)} variant="contained" color="primary" className={classes.drawerButton} startIcon={<CreateIcon />}>
+        폰트 전환
+        </Button>
+        <br></br><br></br>
+        <Button onClick={onClickGenerate} variant="contained" color="primary" className={classes.drawerButton} startIcon={<CreateIcon />}>
+        생성
+        </Button>
+        
+        <Divider />
+        <Divider />
+        <Button href={editedFileUrl} download="thumbnail" variant="contained" color="secondary" startIcon={<SaveIcon />}>
+        저장
+        </Button>
+        
+        <Divider />
+      </Drawer>
     </div>
   );
-}
-
-interface ImgDropProps {
-  changeFile: (file: string) => void;
-}
-
-const ImgDrop: React.FC<ImgDropProps> = ({changeFile}) => {
-
-  const onDrop = useCallback((acceptedFiles) => {
-    acceptedFiles.forEach((file: File) => {
-      const reader = new FileReader()
-      reader.onabort = () => console.log("file reading has aborted")
-      reader.onerror = () => console.log("file reading has failed")
-      reader.readAsDataURL(file)
-      reader.onload = () => {
-        const dataUrl = reader.result
-        if (typeof dataUrl === "string") {
-          changeFile(dataUrl)
-        }
-      }
-    });
-  }, [])
-
-  const {getRootProps, getInputProps} = useDropzone({onDrop})
-
-  return (
-    <div {...getRootProps()}>
-      <input {...getInputProps()}/>
-      <div style={{width:"1280px", height: "720px"}}>
-        <p>파일을 올려주세요</p>
-      </div>
-    </div>
-  )
-}
-
-interface UploadProps {
-  handleChangeFile: (event: React.ChangeEvent<HTMLInputElement>) => (any);
-  downloadUrl: string;
-}
-
-const Upload: React.FC<UploadProps> = ({ handleChangeFile, downloadUrl }) => {
-
-  return (
-    <div>
-      <input type="file" onChange={handleChangeFile} />
-      <a href={downloadUrl} download="thumbnail">다운로드</a>
-    </div>
-  )
-}
-
-
-interface CanvasProps {
-  renderedText: string;
-  renderedText2: string;
-  imgSrc: string;
-  editedImgSrc: string;
-  fontPath: string;
-
-  changeFile: (url: string) => (void);
-}
-
-const createColoredText = async (font: any, fullText: string, color: string, coloredText: string) => {
-  let from = fullText.indexOf(coloredText);
-  let to = from + coloredText.length;
-
-  const textCanvasHeight = 140;
-  const textCanvasWidth = 1000;
-
-  let transparentColor: number = await (Jimp as any).rgbaToInt(100, 100, 0, 0.5);
-  let textCanvas3 = await new Jimp(textCanvasWidth, textCanvasHeight, transparentColor);
-
-  let wi = Jimp.measureText(font, fullText.slice(0, from));
-  // let he = Jimp.measureTextHeight(font, fullText.slice(0, from), wi);
-
-  return (await textCanvas3.print(font, wi, 0, coloredText).color([{ apply: 'xor', params: [color] }]));
-}
-const EditorCanvas: React.FC<CanvasProps> = ({ fontPath, renderedText, renderedText2, imgSrc, changeFile, editedImgSrc }) => {
-
-  useEffect(() => {
-    Jimp.read(imgSrc, async (err, imgLoaded) => {
-
-      const fontHeight = 50;
-      const bottomX = 10
-      const bottomY = 0;
-      const shadowOffset = 4;
-      // get text
-      console.log(`[TEXT FROM PROPS]${renderedText}`)
-
-
-      const textCanvasHeight = 500;
-      const textCanvasWidth = 1000;
-      let transparentColor: number = await (Jimp as any).rgbaToInt(100, 100, 0, 0.5);
-      let textCanvas = await new Jimp(textCanvasWidth, textCanvasHeight, transparentColor);
-      // img resize
-      await imgLoaded.resize(1280, 720);
-      // load font
-      // const fontPath = `${process.env.PUBLIC_URL}/nanum/nanum.fnt`;
-      
-      let font = await Jimp.loadFont(fontPath);
-      // print text to the bottom line
-
-      let orangeColor = '#ffd042'
-      let whiteColor = '#ffffff'
-      let blackColor = '#000000'
-
-      // first line
-      let separator = renderedText.indexOf(' ');
-      let shadow = await createColoredText(font, renderedText, blackColor, renderedText);
-      let text2 = await createColoredText(font, renderedText, whiteColor, renderedText.slice(0, separator));
-      let text3 = await createColoredText(font, renderedText, orangeColor, renderedText.slice(separator));
-      
-
-      let separator2 = renderedText2.indexOf(' ');
-      let shadow2 = await createColoredText(font, renderedText2, blackColor, renderedText2);
-      let text22 = await createColoredText(font, renderedText2, orangeColor, renderedText2.slice(0, separator2));
-      let text32 = await createColoredText(font, renderedText2, whiteColor, renderedText2.slice(separator2));
-
-      let secondOffset = textCanvasHeight - 100;
-      let firstOffset = textCanvasHeight - 200;
-      let textCanvasIndent  = 5
-      await textCanvas.composite(shadow, shadowOffset, shadowOffset + firstOffset);
-      await textCanvas.composite(text2, textCanvasIndent,  firstOffset);
-      await textCanvas.composite(text3, textCanvasIndent,  firstOffset);
-
-      await textCanvas.composite(shadow2, shadowOffset, shadowOffset + secondOffset);
-      await textCanvas.composite(text22, textCanvasIndent, secondOffset);
-      await textCanvas.composite(text32, textCanvasIndent, secondOffset);
-
-      // resize text
-      const compositBottomX = 10;
-      const compositBottomY = imgLoaded.getHeight() - textCanvasHeight - 10
-      await imgLoaded.composite(textCanvas, compositBottomX, compositBottomY);
-
-
-      let imgBase64 = await imgLoaded.getBase64Async(Jimp.MIME_PNG);
-      changeFile(imgBase64);
-    })
-
-  }, [imgSrc, renderedText, renderedText2, fontPath])
-
-  return (
-    <div>
-      <img width="1280px" height="720px" src={editedImgSrc} alt="editorImg" />
-    </div>
-  )
-}
-const invertHex = (hex: string) => {
-  hex = hex.slice(1);
-  let hexString = (Number(`0x1${hex}`) ^ 0xFFFFFF).toString(16).substr(1).toUpperCase();
-  return `#${hexString}`
 }
 
 export default App;
