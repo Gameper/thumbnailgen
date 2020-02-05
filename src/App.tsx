@@ -26,8 +26,8 @@ const spocaSansFontPath = `./spoca-han-sans/spocahansans.fnt`;
 const App: React.FC = () => {
   const [fileUrl, setfileUrl] = useState('')
   const [editedFileUrl, setEditedfileUrl] = useState('')
-  const [newText, setNewText] = useState('');
-  const [newText2, setNewText2] = useState('');
+  const [newText, setNewText] = useState('밥 먹자');
+  const [newText2, setNewText2] = useState('맛있느냐');
   const [renderedText, setRenderedText] = useState('');
   const [renderedText2, setRenderedText2] = useState('');
 
@@ -49,18 +49,6 @@ const App: React.FC = () => {
     console.log("im clicked");
   }
 
-  // return (
-  //   <div className="App">
-  //     <header className="App-header">
-  //       { fileUrl ? <EditorCanvas fontPath={fontPath} renderedText={renderedText} renderedText2={renderedText2} imgSrc={fileUrl} changeFile={changeEditedFile} editedImgSrc={editedFileUrl} /> : <ImgDrop changeFile={(file) => setfileUrl(file)}/>}
-  //       <Upload handleChangeFile={handleChangeFile} downloadUrl={editedFileUrl} />
-  //       <input value={newText} onChange={(event) => setNewText(event.target.value)} />
-  //       <input value={newText2} onChange={(event) => setNewText2(event.target.value)} />
-  //       <button onClick={onClickGenerate}>적용</button>
-  //       <button onClick={()=> fontPath === nanumFontPath ? setFontPath(spocaSansFontPath) : setFontPath(nanumFontPath)} >폰트 전환</button>
-  //     </header>
-  //   </div>
-  // );
   const classes = useStyles();
 
   return (
@@ -88,9 +76,6 @@ const App: React.FC = () => {
         <br></br>
         <Upload handleChangeFile={handleChangeFile} downloadUrl={editedFileUrl} />
         <br></br>
-        폰트2
-        <br></br>
-        텍스트 위치
         <br></br>
         <br></br>
         <br></br>
@@ -101,14 +86,10 @@ const App: React.FC = () => {
         <br></br>
         <br></br>
         <Divider />
-        <TextField value={newText} onChange={(event) => setNewText(event.target.value)} variant="filled" className={classes.textField} id="filled-required" label="Standard" inputProps={{className: classes.textField }} />
-        <TextField value={newText2} onChange={(event) => setNewText2(event.target.value)} variant="filled" className={classes.textField} id="filled-required" label="Standard" inputProps={{className: classes.textField }} />
+        <TextField value={newText} onChange={(event) => setNewText(event.target.value)} className={classes.textField} id="filled-required" inputProps={{className: classes.textField }} />
+        <TextField value={newText2} onChange={(event) => setNewText2(event.target.value)} className={classes.textField} id="filled-required" inputProps={{className: classes.textField }} />
     
         <br></br>
-        
-        <Button onClick={()=> fontPath === nanumFontPath ? setFontPath(spocaSansFontPath) : setFontPath(nanumFontPath)} variant="contained" color="primary" className={classes.drawerButton} startIcon={<CreateIcon />}>
-        폰트 전환
-        </Button>
         <br></br><br></br>
         <Button onClick={onClickGenerate} variant="contained" color="primary" className={classes.drawerButton} startIcon={<CreateIcon />}>
         생성
