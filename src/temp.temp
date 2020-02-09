@@ -1,0 +1,59 @@
+<Drawer
+  className={classes.drawer}
+  variant="permanent"
+  classes={{
+    paper: classes.drawerPaper
+  }}
+  anchor="right"
+>
+  <div className={classes.toolbar} />
+  <br />
+  <br />
+  <Upload handleChangeFile={handleChangeFile} downloadUrl={editedFileUrl} />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <br />
+  <Divider />
+  <TextField
+    value={newText}
+    onChange={(event) => setNewText(event.target.value)}
+    className={classes.textField}
+    id="filled-required"
+    inputProps={{ className: classes.textField }}
+  />
+  <TextField
+    value={newText2}
+    onChange={(event) => setNewText2(event.target.value)}
+    className={classes.textField}
+    id="filled-required"
+    inputProps={{ className: classes.textField }}
+  />
+
+  <br />
+  <br />
+  <br />
+  <Button
+    onClick={onClickGenerate}
+    variant="contained"
+    color="primary"
+    className={classes.drawerButton}
+    startIcon={<CreateIcon />}
+  >
+    생성
+  </Button>
+
+  <Divider />
+  <Divider />
+  <Button href={editedFileUrl} download="thumbnail" variant="contained" color="secondary" startIcon={<SaveIcon />}>
+    저장
+  </Button>
+
+  <Divider />
+</Drawer>;
