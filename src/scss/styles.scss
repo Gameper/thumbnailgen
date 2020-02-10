@@ -1,0 +1,60 @@
+body {
+  background-color: black;
+}
+.test {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  grid-template-rows: 80px 1fr 40px;
+  grid-template-areas: "header header" "main sidebar" "footer footer";
+  height: 100vh;
+}
+.header {
+  grid-area: header;
+  background: #33383e;
+  color: white;
+  font-weight: bold;
+  padding-left: 24px;
+  height: 100%;
+  padding-top: 29px;
+}
+
+.main-container {
+  grid-area: main;
+  background: #282c31;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.sidemenu {
+  grid-area: sidebar;
+  background: #25282b;
+  padding: 24px;
+}
+
+.footer {
+  grid-area: footer;
+  background: #33383e;
+  padding-left: 24px;
+  height: 100%;
+  color: #5b6c82;
+  padding-top: 14px;
+  // align-self: center;
+  font-size: 10px;
+}
+
+.input-field {
+  width: 100%;
+}
+
+.file-input {
+  color: white;
+  margin-bottom: 24px;
+}
+
+.input-container {
+  margin-bottom: 24px;
+}
+
+.thumb-btn {
+  width: 100% !important;
+}
