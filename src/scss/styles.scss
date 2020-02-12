@@ -58,3 +58,10 @@ body {
 .thumb-btn {
   width: 100% !important;
 }
+
+.loading{
+  grid-area: main;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
