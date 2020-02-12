@@ -9,6 +9,7 @@ interface IProps {
   fontPath: string;
 
   changeFile: (url: string) => void;
+  changeLoadingState: (isShowing: boolean) => void;
 }
 
 const createColoredText = async (font: any, fullText: string, color: string, coloredText: string) => {
@@ -32,11 +33,13 @@ const EditorCanvas: React.FC<IProps> = ({
   renderedText2,
   imgSrc,
   changeFile,
-  editedImgSrc
+  editedImgSrc,
+  changeLoadingState,
 }) => {
   useEffect(
     () => {
       Jimp.read(imgSrc, async (err, imgLoaded) => {
+        changeLoadingState(true);
         const fontHeight = 50;
         const bottomX = 10;
         const bottomY = 0;
@@ -89,6 +92,7 @@ const EditorCanvas: React.FC<IProps> = ({
 
         let imgBase64 = await imgLoaded.getBase64Async(Jimp.MIME_PNG);
         changeFile(imgBase64);
+        changeLoadingState(false)
       });
     },
     [ imgSrc, renderedText, renderedText2, fontPath ]

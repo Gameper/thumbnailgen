@@ -3,19 +3,13 @@ import React, { useState, useEffect, useCallback } from "react";
 // import "./App.css";
 import "./scss/styles.scss";
 
-import { makeStyles, createStyles } from "@material-ui/core/styles";
-import Drawer from "@material-ui/core/Drawer";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
 import TextField from "@material-ui/core/TextField";
-import Typography from "@material-ui/core/Typography";
-import Divider from "@material-ui/core/Divider";
 import Button from "@material-ui/core/Button";
 import SaveIcon from "@material-ui/icons/Save";
 import CreateIcon from "@material-ui/icons/Create";
 import ImgDrop from "./components/ImageDrop";
 import Upload from "./components/Upload";
+import Loading from './components/Loading'
 import EditorCanvas from "./components/EditorCanvas";
 import useStyles from "./styles/material-ui-styles";
 
@@ -31,6 +25,7 @@ const App: React.FC = () => {
   const [ newText2, setNewText2 ] = useState("맛있느냐");
   const [ renderedText, setRenderedText ] = useState("");
   const [ renderedText2, setRenderedText2 ] = useState("");
+  const [ isLoading, setIsLoading ]= useState(false);
 
   const [ fontPath, setFontPath ] = useState(nanumFontPath);
 
@@ -42,6 +37,10 @@ const App: React.FC = () => {
 
   const changeEditedFile = (url: string) => {
     setEditedfileUrl(url);
+  };
+
+  const changeLoadingState = (isShowing: boolean) => {
+    setIsLoading(isShowing)
   };
 
   const onClickGenerate = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -69,6 +68,7 @@ const App: React.FC = () => {
             imgSrc={fileUrl}
             changeFile={changeEditedFile}
             editedImgSrc={editedFileUrl}
+            changeLoadingState={changeLoadingState}
           />
         ) : (
           <ImgDrop changeFile={(file) => setfileUrl(file)} />
@@ -119,6 +119,7 @@ const App: React.FC = () => {
         </Button>
       </div>
       <div className="footer">2020 © gameper.io</div>
+      {isLoading && <Loading isStopped={!isLoading}/>}
     </div>
   );
 };
